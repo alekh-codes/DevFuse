@@ -2,14 +2,33 @@ const express = require("express")
 
 const app = express();
 
-
-app.use("/hello",(req,res)=>{
-    res.send("Hello hello")
+app.get('/user',(req,res)=>{
+    console.log(req.query);
+    
+    res.send({firstName:"Alekh",lastName:"thakur"})
 })
 
-app.use("/",(req,res)=>{
-    res.send("Hello from dashboard")
-})
+
+// app.get("/user",(req,res)=>{
+//     res.send({firstName:"Alekh",lastName:"thakur"})
+// })
+
+// app.post("/user",(req,res)=>{
+//     res.send("data saved successfully to DB")
+// })
+
+// app.delete("/user",(req,res)=>{
+//     res.send("Data deleted successfully from DB")
+
+// })
+
+// app.put("/user",(req,res)=>{
+//     res.send("Data updated successfully in the DB")
+// })
+
+
+
+
 
 
 
