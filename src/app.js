@@ -2,10 +2,38 @@ const express = require("express")
 
 const app = express();
 
-app.get('/user',(req,res)=>{
-    console.log(req.query);
+app.get('/user',
+    [(req,res,next)=>{    
     
-    res.send({firstName:"Alekh",lastName:"thakur"})
+    console.log("Handling the route handler 1");    
+    // res.send("Response 1")
+    next();
+},(req,res,next)=>{
+    console.log("Handling the route handler 2");
+    // res.send("Response 2")
+    next();
+    
+}],
+(req,res,next)=>{
+    console.log("Handling the route handler 3");
+    // res.send("Response 3")
+    next();
+    
+},(req,res,next)=>{
+    console.log("Handling the route handler 3");
+    // res.send("Response 3")
+    next();
+    
+},(req,res,next)=>{
+    console.log("Handling the route handler 4");
+    // res.send("Response 4")
+    next();
+    
+},(req,res,next)=>{
+    console.log("Handling the route handler 5");
+    res.send("Response 5")
+    // next();
+    
 })
 
 
