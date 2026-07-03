@@ -1,66 +1,30 @@
 const express = require("express")
+const {adminAuth,userAuth} = require("./middlewares/auth")
 
 const app = express();
-
-app.get('/user',
-    [(req,res,next)=>{    
-    
-    console.log("Handling the route handler 1");    
-    // res.send("Response 1")
-    next();
-},(req,res,next)=>{
-    console.log("Handling the route handler 2");
-    // res.send("Response 2")
-    next();
-    
-}],
-(req,res,next)=>{
-    console.log("Handling the route handler 3");
-    // res.send("Response 3")
-    next();
-    
-},(req,res,next)=>{
-    console.log("Handling the route handler 3");
-    // res.send("Response 3")
-    next();
-    
-},(req,res,next)=>{
-    console.log("Handling the route handler 4");
-    // res.send("Response 4")
-    next();
-    
-},(req,res,next)=>{
-    console.log("Handling the route handler 5");
-    res.send("Response 5")
-    // next();
-    
+app.get('/',(req,res)=>{
+    res.send("Hello from node.js")
 })
 
+//Handle Auth midleware for type of Requests
 
-// app.get("/user",(req,res)=>{
-//     res.send({firstName:"Alekh",lastName:"thakur"})
-// })
+app.use("/admin",adminAuth)
 
-// app.post("/user",(req,res)=>{
-//     res.send("data saved successfully to DB")
-// })
+app.use("/user",userAuth);
 
-// app.delete("/user",(req,res)=>{
-//     res.send("Data deleted successfully from DB")
+app.use("/user/data",(req,res)=>{
+    res.send("User data sent")
+})
 
-// })
+app.get("/admin/allUserData",(req,res)=>{
+    res.send("Get all user data")
+})
+app.get("/admin/deleteData",(req,res)=>{
+   res.send("Deleted a user")
+})
 
-// app.put("/user",(req,res)=>{
-//     res.send("Data updated successfully in the DB")
-// })
-
-
-
-
-
-
-
-app.listen(3000,()=>{
-    console.log("Server running on PORT 3000");
+const PORT =3000
+app.listen(PORT,()=>{
+    console.log(`Server running on PORT ${PORT}`);
     
 })
