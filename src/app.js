@@ -1,27 +1,33 @@
 const express = require("express")
-const {adminAuth,userAuth} = require("./middlewares/auth")
+
 
 const app = express();
-app.get('/',(req,res)=>{
-    res.send("Hello from node.js")
-})
 
-//Handle Auth midleware for type of Requests
 
-app.use("/admin",adminAuth)
 
-app.use("/user",userAuth);
+const m1 = (req, res, next) => {
+    console.log("M1");
+    next();
+};
 
-app.use("/user/data",(req,res)=>{
-    res.send("User data sent")
-})
+const m2 = (req, res, next) => {
+    console.log("M2");
+    next();
+};
 
-app.get("/admin/allUserData",(req,res)=>{
-    res.send("Get all user data")
-})
-app.get("/admin/deleteData",(req,res)=>{
-   res.send("Deleted a user")
-})
+const m3 = (req, res, next) => {
+    console.log("M3");
+    next(new Error("end of stack"))
+
+};
+
+const errorHandle = (err,req,res,next)=>{
+    res.status(500).send(err.message)
+}
+
+
+app.get("/", m1, m2, m3);
+app.use(errorHandle)
 
 const PORT =3000
 app.listen(PORT,()=>{
