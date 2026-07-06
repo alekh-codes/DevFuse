@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "A place where developers can connect to build projects and discuss ideas",
   "main": "index.js",
-  "scripts": {    
-    "start" : "node src/app.js",
-    "dev" : "nodemon src/app.js"
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js"
   },
   "keywords": [
     "node.js",
@@ -15,6 +15,8 @@
   "author": "Alekh",
   "license": "ISC",
   "dependencies": {
-    "express": "^5.2.1"
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "mongoose": "^9.7.3"
   }
 }
