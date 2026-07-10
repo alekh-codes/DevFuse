@@ -40,8 +40,6 @@ app.get("/user", async (req,res)=>{
 //Get user by email
 app.get("/user",async (req,res)=>{
     const email = req.body.emailId;
-    
-
     try{
         const user = await User.findOne({emailId:email})
         if(!user){
@@ -87,10 +85,10 @@ app.patch("/user", async(req,res)=>{
     const userId = req.body.userId;
     const data = req.body;
     try{
-        await User.findByIdAndUpdate(userId,data);
+        await User.findByIdAndUpdate(userId,data,{runValidators:true});
         res.send("User updated successfully!");
     }catch(err){
-        res.send("Something went wrong")
+        res.send("Update failed: " + err.message)
     }
 })
 
