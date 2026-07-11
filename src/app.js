@@ -11,12 +11,31 @@ app.post("/signup", async (req,res)=>{
       
     //Create a new instance of User model
     const user = new User(req.body)
+    const data = req.body;
 
     try{
+        if(data?.firstName.length <3){
+            throw new Error("Name format is invalid")
+        }
+        if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data?.emailId)){
+            throw new Error("Email is invalid")
+        }
+        if(data?.password.length < 8){
+            throw new Error("Password must be of 8 characters")
+        }
+        if(data?.age <18){
+            throw new Error("You are not eligible for this platform")
+        }
+        if(data?.about.length >150){
+            throw new Error("About cannot be more than 10 words")
+        }
+        if(data?.skills.length >10){
+            throw new Error("Skills cannot be more than 10")
+        }
         await user.save();
         res.send("User data added successfully")
     }catch(err){
-        res.status(400).send("Error in saving data: " + err.message);
+        res.status(400).send("Error: " + err.message);
     }
 })
 
@@ -81,10 +100,20 @@ app.delete("/user",async (req,res)=>{
     }
 })
 
-app.patch("/user", async(req,res)=>{
-    const userId = req.body.userId;
+app.patch("/user/:userId", async(req,res)=>{
+    const userId = req.params.userId;
     const data = req.body;
     try{
+        const AllowedUpdates = ["age","skills","about","gender"];
+        const isUpdateAllowed = Object.keys(data).every(k=>
+            AllowedUpdates.includes(k)
+        )
+        if(!isUpdateAllowed){
+            throw new Error("Update not allowed")
+        }
+        if(data?.skills.length >10){
+            throw new Error("Skills cannot be more than 10")
+        }
         await User.findByIdAndUpdate(userId,data,{runValidators:true});
         res.send("User updated successfully!");
     }catch(err){
