@@ -5,8 +5,11 @@ const connectDB = require("./config/database");
 const User = require("./models/User");
 const { validateSignup } = require("./utils/validation");
 const bcrypt = require("bcrypt");
-
+const cookieParser = require("cookie-parser");
+const jwt = require("jsonwebtoken");
+const { userAuth } = require("./middlewares/auth");
 app.use(express.json());
+app.use(cookieParser());
 
 // Add user to database
 app.post("/signup", async (req, res) => {
@@ -34,106 +37,44 @@ app.post("/signup", async (req, res) => {
 });
 
 //Login API
-app.post("/login",async (req,res)=>{
-    try{
-        const {emailId, password} = req.body;
+app.post("/login", async (req, res) => {
+  try {
+    const { emailId, password } = req.body;
 
-    const user = await User.findOne({emailId});
-    if(!user){
-        throw new Error("Invalid credentials")
+    const user = await User.findOne({ emailId });
+    if (!user) {
+      throw new Error("Invalid credentials");
     }
-    const isValidPassword = await bcrypt.compare(password,user.password);
-    if(isValidPassword){
-        res.send("Login successfull");
+    const isValidPassword = await bcrypt.compare(password, user.password);
+    if (isValidPassword) {
+      const token = await jwt.sign({ _id: user._id }, "DevFuse$02$@11", {expiresIn : "1d"});
+
+      res.cookie("token", token);
+
+      res.send("Login successfull");
+    } else {
+      throw new Error("Invalid credentials");
     }
-    else{
-        throw new Error("Invalid credentials")
-    }
-    } catch (err) {
-        res.status(400).send("Invalid credentials");
-    }
+  } catch (err) {
+    res.status(400).send("Invalid credentials");
+  }
+});
+
+//Profile
+app.get("/profile", userAuth, async (req, res) => {
+  try {
+    const user = req.user;
+    res.send(user);
+  } catch (err) {
+    res.send("Error:" + err.message);
+  }
+});
+
+app.post("/sendConnectionRequest", userAuth,(req,res)=>{
+
+  const user = req.user;
+  res.send(user.firstName + ' sends the connection request');
 })
-
-//Get user by id
-app.get("/user", async (req, res) => {
-  const id = req.body.id;
-  try {
-    const user = await User.findById(id);
-    if (!user) {
-      res.status(404).send("User not found");
-    } else {
-      res.send(user);
-    }
-  } catch (err) {
-    res.status(404).send("Somethig went wrong");
-  }
-});
-
-//Get user by email
-app.get("/user", async (req, res) => {
-  const email = req.body.emailId;
-  try {
-    const user = await User.findOne({ emailId: email });
-    if (!user) {
-      res.status(400).send("User not found");
-    } else {
-      res.send(user);
-    }
-
-    //     const user = await User.find({emailId : email})
-    //     if(user.length ===0){
-    //         res.status(400).send("User not found");
-    //     }
-    //     else{
-    //         res.send(user);
-    //     }
-  } catch (err) {
-    res.status(404).send("Something wnent wrong");
-  }
-});
-
-//Get all the users
-app.get("/feed", async (req, res) => {
-  try {
-    const users = await User.find({});
-    res.send(users);
-  } catch (err) {
-    res.status(400).send("Something went wrong");
-  }
-});
-
-//Delete a user
-app.delete("/user", async (req, res) => {
-  const userId = req.body.userId;
-  try {
-    const user = await User.findByIdAndDelete(userId);
-    res.send("User deleted successfully");
-  } catch (err) {
-    res.send("Something went wrong");
-  }
-});
-
-app.patch("/user/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  const data = req.body;
-  try {
-    const AllowedUpdates = ["age", "skills", "about", "gender"];
-    const isUpdateAllowed = Object.keys(data).every((k) =>
-      AllowedUpdates.includes(k),
-    );
-    if (!isUpdateAllowed) {
-      throw new Error("Update not allowed");
-    }
-    if (data?.skills.length > 10) {
-      throw new Error("Skills cannot be more than 10");
-    }
-    await User.findByIdAndUpdate(userId, data, { runValidators: true });
-    res.send("User updated successfully!");
-  } catch (err) {
-    res.send("Update failed: " + err.message);
-  }
-});
-
 connectDB()
   .then(() => {
     console.log("Database connected successfully");
