@@ -37,7 +37,15 @@ const validateEditData = (req) =>{
  
 }
 
+const validateNewPassword = (req) => {
+  const {newPassword} = req.body;
+  if (!validator.isStrongPassword(newPassword)) {
+    throw new Error("Enter a strong password");
+  }
+  return newPassword
+}
 module.exports ={
   validateSignup,
-  validateEditData
+  validateEditData,
+  validateNewPassword
 }
