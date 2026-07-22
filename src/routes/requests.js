@@ -18,7 +18,6 @@ requestsRouter.post(
         toUserId,
         status,
       });
-
      
       const allowedStatus = ["interested","ignored"];
       if(!allowedStatus.includes(status)){
@@ -49,7 +48,7 @@ requestsRouter.post(
       const requestInfo = await connectionRequest.save();
 
       res.json({
-        message: "connection request sent successfully",
+        message: `${req.user.firstName} ${status==="interested" ? " is interested in " : "ignored"} ${toUser.firstName}`,
         data: requestInfo,
       });
     } catch (err) {
