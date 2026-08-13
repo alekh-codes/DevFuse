@@ -3,11 +3,13 @@ const profileRouter = express.Router();
 const bcrypt = require("bcrypt");
 const { userAuth } = require("../middlewares/auth");
 const { validateEditData, validateNewPassword } = require("../utils/validation");
+const User = require("../models/user");
 
 
+const SAFE_USER_DATA = "firstName lastName emailId imagUrl gender age skills about";
 profileRouter.get("/profile", userAuth, async (req, res) => {
   try {
-    const user = req.user;
+    const user = await User.findById(req.user._id).select(SAFE_USER_DATA);
     res.send(user);
   } catch (err) {
     res.send("Error:" + err.message);
