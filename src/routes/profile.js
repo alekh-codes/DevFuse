@@ -30,7 +30,7 @@ profileRouter.patch("/profile/edit",userAuth,async (req,res) =>{
 
     res.json({
       message: `${loggedInUser.firstName}, your data was updated successfully`,
-      data : loggedInUser
+      user : loggedInUser
     })
 
   }catch(err){
@@ -63,4 +63,4 @@ profileRouter.patch("/profile/password",userAuth,async (req,res)=>{
   }
 })
 
-module.exports = profileRouter 
+module.exports = profileRouter

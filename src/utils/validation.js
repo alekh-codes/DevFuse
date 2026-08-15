@@ -26,7 +26,6 @@ const validateEditData = (req) =>{
     "firstName",
     "lastName",
     "about",
-    "imagUrl",
     "skills",
     "gender",
     "age"
