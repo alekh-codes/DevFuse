@@ -48,7 +48,7 @@ authRouter.post("/login", async (req, res) => {
 
       const safeData = await User.findById(user._id).select(SAFE_USER_DATA);
       res.json({message:"Login successfull",
-        safeData
+        user:safeData
       })
     } else {
       throw new Error("Invalid credentials");
