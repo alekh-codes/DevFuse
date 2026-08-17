@@ -5,7 +5,8 @@ const ConnectionRequest = require("../models/connectionRequest");
 const User = require("../models/user");
 
 const SAFE_USER_DATA = "firstName lastName imagUrl gender age skills about";
-userRouter.get("/users/requests/received", userAuth, async (req, res) => {
+
+userRouter.get("/requests/received", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
@@ -19,11 +20,11 @@ userRouter.get("/users/requests/received", userAuth, async (req, res) => {
       data: requestConnection,
     });
   } catch (err) {
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).json({message: err.message});
   }
 });
 
-userRouter.get("/users/connections", userAuth, async (req, res) => {
+userRouter.get("/connections", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
@@ -45,7 +46,7 @@ userRouter.get("/users/connections", userAuth, async (req, res) => {
 
     res.json({
       message: `Connections of ${loggedInUser.firstName}`,
-      data,
+      user:data,
     });
   } catch (err) {
     res.status(400).send("ERROR: " + err.message);
