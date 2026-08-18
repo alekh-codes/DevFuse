@@ -7,26 +7,30 @@ const SAFE_USER_DATA = "firstName lastName emailId imagUrl gender age skills abo
 
 authRouter.post("/signup", async (req, res) => {
   try {
-    //Validation of data
     validateSignup(req);
 
-    const { firstName, lastName, emailId, password,age,gender,skills } = req.body;
-    //Encrypt password
+    const { firstName, lastName, emailId, password } = req.body;
     const passwordHash = await bcrypt.hash(password, 10);
 
-    //Create a new instance of User model
     const user = new User({
       firstName,
       lastName,
       emailId,
       password: passwordHash,
-      age,
-      gender,
-      skills
+      
     });
 
-    await user.save();
-    res.send("User data added successfully");
+    const savedUser = await user.save();
+    const token = await savedUser.getJWT();
+
+    res.cookie("token", token,{
+      maxAge : 7 * 24 * 60 * 60 * 1000,
+      
+    });
+    res.json({
+      message :"Signed in successfully!",
+      user:savedUser
+    })
   } catch (err) {
     res.status(400).send("Error: " + err.message);
   }
