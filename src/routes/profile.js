@@ -4,6 +4,11 @@ const bcrypt = require("bcrypt");
 const { userAuth } = require("../middlewares/auth");
 const { validateEditData, validateNewPassword } = require("../utils/validation");
 const User = require("../models/user");
+const multer = require("multer");
+const path = require("path")
+const upload = multer({
+  dest:path.join(__dirname, "../uploads"),
+})
 
 
 const SAFE_USER_DATA = "firstName lastName emailId imagUrl gender age skills about";
@@ -16,7 +21,7 @@ profileRouter.get("/profile", userAuth, async (req, res) => {
   }
 });
 
-profileRouter.patch("/profile/edit",userAuth,async (req,res) =>{
+profileRouter.patch("/profile/edit",userAuth,upload.single("imagUrl"),async (req,res) =>{
   try{
     if(!validateEditData(req)){
       throw new Error("Invalid field request");
@@ -26,6 +31,11 @@ profileRouter.patch("/profile/edit",userAuth,async (req,res) =>{
     
 
     Object.keys(req.body).forEach(key=> (loggedInUser[key] = req.body[key]));
+
+    if (req.file) {
+         loggedInUser.imagUrl = `/uploads/${req.file.filename}`;
+      }
+
     await loggedInUser.save();
 
     res.json({

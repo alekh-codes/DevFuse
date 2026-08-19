@@ -4,6 +4,7 @@ const app = express();
 const connectDB = require("./config/database");
 const cookieParser = require("cookie-parser");
 const cors = require("cors")
+const path = require("path")
 app.use(
   cors({
     origin: "http://localhost:5173",
@@ -17,10 +18,15 @@ const profileRouter = require("./routes/profile")
 const requestsRouter = require("./routes/requests")
 const userRouter = require("./routes/user")
 
+profileRouter.use(
+  "/uploads",
+  express.static(path.join(__dirname,"uploads"))
+)
 app.use("/",authRouter)
 app.use("/",profileRouter)
 app.use("/",requestsRouter)
 app.use("/",userRouter)
+
 
 connectDB()
   .then(() => {

@@ -57,10 +57,6 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
 
-    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
-    const page = parseInt(req.query.page) || 1;
-    const skip = (page - 1) * limit;
-
     const connectionRequests = await ConnectionRequest.find({
       $or: [
         { fromUserId: loggedInUser._id },
@@ -70,7 +66,6 @@ userRouter.get("/feed", userAuth, async (req, res) => {
 
     const hideUsersFromFeed = new Set();
 
-    // Never show the logged-in user
     hideUsersFromFeed.add(loggedInUser._id.toString());
 
     connectionRequests.forEach((request) => {
@@ -82,14 +77,10 @@ userRouter.get("/feed", userAuth, async (req, res) => {
       _id: {
         $nin: Array.from(hideUsersFromFeed),
       },
-    })
-      .select(SAFE_USER_DATA)
-      .skip(skip)
-      .limit(limit);
+    }).select(SAFE_USER_DATA);
 
     res.json({
       data: users,
-      hasMore: users.length === limit,
     });
 
   } catch (err) {
