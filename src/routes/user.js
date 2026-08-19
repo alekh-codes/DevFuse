@@ -56,33 +56,46 @@ userRouter.get("/connections", userAuth, async (req, res) => {
 userRouter.get("/feed", userAuth, async (req, res) => {
   try {
     const loggedInUser = req.user;
-    const limit = parseInt(req.query.limit) || 10;
-    limit > 50 ?  50 : limit;
+
+    const limit = Math.min(parseInt(req.query.limit) || 10, 50);
     const page = parseInt(req.query.page) || 1;
-    const skip = (page-1)*limit;
+    const skip = (page - 1) * limit;
 
     const connectionRequests = await ConnectionRequest.find({
-      $or: [{ fromUserId: loggedInUser._id }, { toUserId: loggedInUser._id }],
+      $or: [
+        { fromUserId: loggedInUser._id },
+        { toUserId: loggedInUser._id }
+      ],
     }).select("fromUserId toUserId");
 
     const hideUsersFromFeed = new Set();
-    connectionRequests.forEach((req) => {
-      hideUsersFromFeed.add(req.fromUserId.toString());
-      hideUsersFromFeed.add(req.toUserId.toString());
+
+    // Never show the logged-in user
+    hideUsersFromFeed.add(loggedInUser._id.toString());
+
+    connectionRequests.forEach((request) => {
+      hideUsersFromFeed.add(request.fromUserId.toString());
+      hideUsersFromFeed.add(request.toUserId.toString());
     });
 
     const users = await User.find({
-      $and: [
-        { _id: { $nin: Array.from(hideUsersFromFeed) } },
-        { _id: { $ne: loggedInUser._id } },
-      ],
-    }).select(SAFE_USER_DATA)
-    .skip(skip)
-    .limit(limit)
-    
-    res.json({data:users})
+      _id: {
+        $nin: Array.from(hideUsersFromFeed),
+      },
+    })
+      .select(SAFE_USER_DATA)
+      .skip(skip)
+      .limit(limit);
+
+    res.json({
+      data: users,
+      hasMore: users.length === limit,
+    });
+
   } catch (err) {
-    res.status(400).json({ messgae: err.message });
+    res.status(400).json({
+      message: err.message,
+    });
   }
 });
 
