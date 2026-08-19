@@ -38,12 +38,15 @@ profileRouter.patch("/profile/edit",userAuth,async (req,res) =>{
   }
 })
 
-profileRouter.patch("/profile/password",userAuth,async (req,res)=>{ 
+profileRouter.patch("/edit/password",async (req,res)=>{ 
   try{
-    const {password,newPassword} = req.body;
-    const user = req.user;
+    const {emailId,password,newPassword} = req.body;
+   
 
-  const isValidPassword = await user.validatePassword(password);
+    const findUser = await User.findOne({emailId});
+    if(!findUser) throw new Error("Invalid credentials");
+    
+  const isValidPassword = await findUser.validatePassword(password);
   if(!isValidPassword){
     throw new Error("Current password does not match");
   }
@@ -53,9 +56,9 @@ profileRouter.patch("/profile/password",userAuth,async (req,res)=>{
   }
 
   const newPass = await bcrypt.hash(newPassword,10);
-  user.password = newPass;
+  findUser.password = newPass;
 
-  await user.save();
+  await findUser.save();
   res.send("Password updated successfully!")
 
   }catch(err){
