@@ -90,4 +90,18 @@ userRouter.get("/feed", userAuth, async (req, res) => {
   }
 });
 
+userRouter.post("/deleteUser",userAuth,async(req,res) =>{
+  try{
+    const {_id} = req.user;
+
+
+  await User.findByIdAndDelete(_id);
+  res.json({message: "Account deleted!"})
+  }
+  catch(err){
+    res.status(500).json({
+      message: err.message
+    })
+  }
+})
 module.exports = userRouter;

@@ -88,11 +88,13 @@ requestsRouter.post("/request/review/:status/:requestId",userAuth, async (req, r
 
     const data = await requestConnection.save();
 
-    res.json({message : "Connection request accepted"})
+    res.json({message : "Connection request accepted",
+       data : loggedInUser
+    })
   } catch (err) {
     res.status(400).json({ 
       messgae: "Error: " + err.message,
-      data : loggedInUser
+     
     });
   }
 });
