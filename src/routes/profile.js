@@ -60,11 +60,12 @@ profileRouter.patch("/edit/password",async (req,res)=>{
   if(!isValidPassword){
     throw new Error("Current password does not match");
   }
-  
+  if(password === newPassword) throw new Error("New password must be different");
+
   if(!validateNewPassword(req)){
     throw new Error("Invalid password")
   }
-
+  
   const newPass = await bcrypt.hash(newPassword,10);
   findUser.password = newPass;
 
@@ -72,7 +73,7 @@ profileRouter.patch("/edit/password",async (req,res)=>{
   res.send("Password updated successfully!")
 
   }catch(err){
-    res.status(400).send("ERROR: " + err.message);
+    res.status(400).send(err.message);
   }
 })
 
