@@ -77,4 +77,20 @@ profileRouter.patch("/edit/password",async (req,res)=>{
   }
 })
 
+profileRouter.get("/viewProfile/:toUserId", userAuth, async (req, res) => {
+  try {
+    const id = req.params.toUserId;
+
+    const findUser = await User.findById(id).select(SAFE_USER_DATA);
+
+    if (!findUser) {
+      throw new Error("User not found");
+    }
+
+    res.status(200).json({ user: findUser });
+  } catch (err) {
+    res.status(400).json({ message: err.message });
+  }
+});
+
 module.exports = profileRouter
